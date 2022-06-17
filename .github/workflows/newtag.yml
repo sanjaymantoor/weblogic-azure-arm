@@ -121,10 +121,12 @@ jobs:
           fi
 
           git checkout -b ${tagbranch}
-
+          ls
+          
           # replace pids
           export targetARM="target"
           for d in weblogic-azure-vm/*/ ; do
+              echo #### ${d}
               # for admin offer and single node offer
               if [ -d ${d}${targetARM} ];then
                 list=$(find ${d}${targetARM} | grep ".json")
@@ -138,6 +140,7 @@ jobs:
               fi
 
               for d1 in $d*/; do
+                  echo #### ${d1}
                   if [ ! -d ${d1}${targetARM} ];then  
                       continue;
                   fi
