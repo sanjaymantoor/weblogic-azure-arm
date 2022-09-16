@@ -55,7 +55,9 @@
         }
     },
     "variables": {
-        "name_deploymentScriptUserDefinedManagedIdentity": "wls-vm-keyvault-user-defined-managed-itentity"
+        "const_roleDefinitionIdOfContributor": "b24988ac-6180-42a0-ab88-20f7382dd24c",
+        "name_deploymentScriptUserDefinedManagedIdentity": "wls-vm-keyvault-user-defined-managed-itentity",
+        "name_roleAssignmentName": "[guid(format('{0}{1}Role assignment in resource group scope', subscription().id, parameters('utcValue')))]"
     },
     "resources": [
         {
@@ -65,9 +67,26 @@
             "location": "[parameters('location')]"
         },
         {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "${azure.apiVersionForRoleAssignment}",
+            "name": "[variables('name_roleAssignmentName')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('name_deploymentScriptUserDefinedManagedIdentity'))]"
+            ],
+            "properties": {
+                "description": "Assign subscription scope role to User Assigned Managed Identity ",
+                "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities',variables('name_deploymentScriptUserDefinedManagedIdentity'))).principalId]",
+                "principalType": "ServicePrincipal",
+                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', variables('const_roleDefinitionIdOfContributor'))]"
+            }
+        },
+        {
             "type": "Microsoft.KeyVault/vaults",
             "apiVersion": "${azure.apiVersionForKeyVault}",
             "name": "[parameters('keyvaultName')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Authorization/roleAssignments', variables('name_roleAssignmentName'))]"
+            ],
             "location": "[parameters('location')]",
             "properties": {
                 "sku": {
