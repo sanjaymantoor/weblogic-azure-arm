@@ -2,12 +2,6 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "identity": {
-            "type": "object",
-            "metadata": {
-                "description": "Managed identity to be used for the deployment script. Currently, only user-assigned MSI is supported."
-            }
-        },
         "keyvaultName": {
             "type": "string",
             "defaultValue": "[concat('wls-kv-', uniqueString(resourceGroup().id, deployment().name))]",
@@ -60,28 +54,16 @@
             "defaultValue": "[utcNow()]"
         }
     },
-    "functions": [
-        {
-            "namespace": "identity",
-            "members": {
-                "getId": {
-                    "parameters": [
-                        {
-                            "name": "items",
-                            "type": "object"
-                        }
-                    ],
-                    "output": {
-                        "type": "string",
-                        "value": "[if(empty(parameters('items').userAssignedIdentities), '', substring(string(parameters('items').userAssignedIdentities),add(indexOf(string(parameters('items').userAssignedIdentities),'\"'),1),sub(lastIndexOf(string(parameters('items').userAssignedIdentities), '\"'),add(indexOf(string(parameters('items').userAssignedIdentities),'\"'),1))))]"
-                    }
-                }
-            }
-        }
-    ],
     "variables": {
+        "name_deploymentScriptUserDefinedManagedIdentity": "wls-vm-keyvault-user-defined-managed-itentity"
     },
     "resources": [
+        {
+            "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+            "apiVersion": "${azure.apiVersionForIndentity}",
+            "name": "[variables('name_deploymentScriptUserDefinedManagedIdentity')]",
+            "location": "[parameters('location')]"
+        },
         {
             "type": "Microsoft.KeyVault/vaults",
             "apiVersion": "${azure.apiVersionForKeyVault}",
@@ -95,7 +77,7 @@
                 "tenantId": "[subscription().tenantId]",
                 "accessPolicies": [
                     {
-                        "objectId": "[reference(string(identity.getId(parameters('identity'))), '${azure.apiVersionForIndentity}').principalId]",
+                        "objectId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('name_deploymentScriptUserDefinedManagedIdentity')).principalId)]",
                         "tenantId": "[subscription().tenantId]",
                         "permissions": "[parameters('permission')]"
                     }
@@ -114,13 +96,28 @@
             "dependsOn": [
                 "[resourceId('Microsoft.KeyVault/vaults', parameters('keyvaultName'))]"
             ],
-            "identity": "[parameters('identity')]",
+            "identity": {
+                "type": "UserAssigned",
+                "userAssignedIdentities": {
+                    "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('name_deploymentScriptUserDefinedManagedIdentity'))]": {}
+                }
+            },
             "kind": "AzurePowerShell",
             "properties": {
                 "forceUpdateTag": "[parameters('utcValue')]",
                 "azPowerShellVersion": "5.0",
                 "timeout": "PT30M",
                 "arguments": "[format(' -vaultName {0} -certificateName {1} -subjectName {2}', parameters('keyvaultName'), parameters('secretName'), parameters('subjectName'))]",
+                "environmentVariables": [
+                    {
+                        "name": "MANAGED_IDENTITY_ID",
+                        "value": "[variables('name_deploymentScriptUserDefinedManagedIdentity')]"
+                    },
+                    {
+                        "name": "RESOURCE_GROUP_NAME",
+                        "value": "[resourceGroup().name]"
+                    }
+                ],
                 "scriptContent": "
                     param(
                         [string] [Parameter(Mandatory=$true)] $vaultName,
@@ -170,6 +167,11 @@
                         $DeploymentScriptOutputs['certThumbprint'] = $newCert.Thumbprint
                         $newCert | Out-String
                     }
+
+                    # delete user assigned managed identity.
+                    $identityName = [System.Environment]::GetEnvironmentVariable('MANAGED_IDENTITY_ID')
+                    $resourceGroupName= [System.Environment]::GetEnvironmentVariable('RESOURCE_GROUP_NAME')
+                    Get-AzUserAssignedIdentity -ResourceGroupName $resourceGroupName -Name $identityName | Remove-AzUserAssignedIdentity
                 ",
                 "cleanupPreference": "OnSuccess",
                 "retentionInterval": "P1D"
