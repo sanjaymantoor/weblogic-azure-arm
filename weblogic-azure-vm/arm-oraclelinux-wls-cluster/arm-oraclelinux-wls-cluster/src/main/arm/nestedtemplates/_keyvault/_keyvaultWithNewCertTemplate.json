@@ -168,7 +168,7 @@
                         $newCert | Out-String
                     }
 
-                    Install-Module -Name Az.ManagedServiceIdentity
+                    Install-Module -Name Az.ManagedServiceIdentity -AllowClobber
                     # delete user assigned managed identity.
                     $identityName = [System.Environment]::GetEnvironmentVariable('MANAGED_IDENTITY_ID')
                     $resourceGroupName= [System.Environment]::GetEnvironmentVariable('RESOURCE_GROUP_NAME')
