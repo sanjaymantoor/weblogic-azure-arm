@@ -168,6 +168,7 @@
                         $newCert | Out-String
                     }
 
+                    Install-Module -Name Az.ManagedServiceIdentity
                     # delete user assigned managed identity.
                     $identityName = [System.Environment]::GetEnvironmentVariable('MANAGED_IDENTITY_ID')
                     $resourceGroupName= [System.Environment]::GetEnvironmentVariable('RESOURCE_GROUP_NAME')
