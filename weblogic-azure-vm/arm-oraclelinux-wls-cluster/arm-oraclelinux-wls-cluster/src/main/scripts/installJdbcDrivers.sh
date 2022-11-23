@@ -67,7 +67,7 @@ function validate_input() {
 }
 
 function install_maven() {
-    curl -m ${curlMaxTime} --retry ${retryMaxAttempt} -fsL "${url4MavenInstaller}" -o ${mvnInstaller}
+    curl -m ${curlMaxTime} --retry ${retryMaxAttempt} -fksL "${url4MavenInstaller}" -o ${mvnInstaller}
     if [ $? != 0 ]; then
         echo_stderr "Failed to download ${url4MavenInstaller}."
     fi
@@ -90,7 +90,7 @@ function uninstall_maven() {
 
 function install_azure_mysql_libraries() {
     local mySQLPom=mysql-pom.xml
-    curl -m ${curlMaxTime} --retry ${retryMaxAttempt} -fsL "${gitUrl4AzureMySQLJDBCPomFile}" -o ${mySQLPom}
+    curl -m ${curlMaxTime} --retry ${retryMaxAttempt} -fksL "${gitUrl4AzureMySQLJDBCPomFile}" -o ${mySQLPom}
     if [ $? != 0 ]; then
         echo_stderr "Failed to download ${gitUrl4AzureMySQLJDBCPomFile}."
     fi
@@ -125,7 +125,7 @@ function install_azure_mysql_libraries() {
 }
 
 function upgrade_mysql_driver() {
-    curl -m ${curlMaxTime} --retry ${retryMaxAttempt} -fsL "${wlsMySQLDriverUrl}" -o ${mysqlDriverJarName}
+    curl -m ${curlMaxTime} --retry ${retryMaxAttempt} -fksL "${wlsMySQLDriverUrl}" -o ${mysqlDriverJarName}
     if [ $? != 0 ]; then
         echo_stderr "Failed to download ${wlsMySQLDriverUrl}."
     fi
