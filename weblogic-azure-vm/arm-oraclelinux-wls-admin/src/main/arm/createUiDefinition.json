@@ -1027,10 +1027,6 @@
                                         {
                                             "regex": "^[a-z0-9A-Z/]{1,30}$",
                                             "message": "The value must be 1-30 characters long and must only contain letters, numbers, and slashes (/)."
-                                        },
-                                        {
-                                            "isValid": "[if(and(bool(steps('section_database').databaseConnectionInfo.enablePswlessConnection),equals(steps('section_database').databaseConnectionInfo.databaseType, 'sqlserver')), greater(length(steps('section_database').databaseConnectionInfo.dbIdentity.userAssignedIdentities),0), bool('true'))]",
-                                            "message": "You must select at least one managed identity that has access to your database."
                                         }
                                     ]
                                 },
@@ -1064,6 +1060,10 @@
                                         {
                                             "isValid": "[if(and(bool(steps('section_database').databaseConnectionInfo.enablePswlessConnection), equals(steps('section_database').databaseConnectionInfo.databaseType, 'sqlserver')), and(not(contains(steps('section_database').databaseConnectionInfo.dsConnectionURL, 'authentication=ActiveDirectoryMSI')),not(contains(steps('section_database').databaseConnectionInfo.dsConnectionURL, 'msiClientId'))), 'true')]",
                                             "message": "The offer will append authentication with ActiveDirectoryMSI, and append msiClientId with your managed identity client ID automatically, please do not specify them in your connection string."
+                                        },
+                                        {
+                                            "isValid": "[if(and(bool(steps('section_database').databaseConnectionInfo.enablePswlessConnection),equals(steps('section_database').databaseConnectionInfo.databaseType, 'sqlserver')), greater(length(steps('section_database').databaseConnectionInfo.dbIdentity.userAssignedIdentities),0), bool('true'))]",
+                                            "message": "You must select at least one managed identity that has access to your database."
                                         }
                                     ]
                                 },
