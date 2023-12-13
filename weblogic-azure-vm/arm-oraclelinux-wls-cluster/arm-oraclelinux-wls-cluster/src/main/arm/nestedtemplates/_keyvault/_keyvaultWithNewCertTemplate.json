@@ -124,7 +124,7 @@
             "kind": "AzurePowerShell",
             "properties": {
                 "forceUpdateTag": "[parameters('utcValue')]",
-                "azPowerShellVersion": "5.0",
+                "azPowerShellVersion": "${azure.powershell.version}",
                 "timeout": "PT30M",
                 "arguments": "[format(' -vaultName {0} -certificateName {1} -subjectName {2}', parameters('keyvaultName'), parameters('secretName'), parameters('subjectName'))]",
                 "environmentVariables": [
