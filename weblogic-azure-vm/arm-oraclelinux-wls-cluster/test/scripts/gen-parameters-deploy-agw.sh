@@ -6,7 +6,7 @@
 # This script is to generate test parameters for Appgateway testing.
 
 #read arguments from stdin
-read parametersPath repoPath testbranchName adminVMName appGatewaySSLCertificateData appGatewaySSLCertificatePassword numberOfInstances location wlsPassword wlsUserName wlsDomainName managedServerPrefix
+read parametersPath repoPath testbranchName adminVMName  numberOfInstances location wlsPassword wlsUserName wlsDomainName managedServerPrefix
 
 cat <<EOF > ${parametersPath}
 {
@@ -18,12 +18,6 @@ cat <<EOF > ${parametersPath}
         },
         "adminVMName": {
             "value": "${adminVMName}"
-        },
-        "appGatewaySSLCertificateData": {
-            "value": "${appGatewaySSLCertificateData}"
-        },
-        "appGatewaySSLCertificatePassword": {
-            "value": "${appGatewaySSLCertificatePassword}"
         },
         "numberOfInstances": {
             "value": ${numberOfInstances}

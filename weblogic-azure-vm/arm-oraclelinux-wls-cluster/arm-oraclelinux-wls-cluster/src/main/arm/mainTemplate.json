@@ -55,7 +55,7 @@
             }
         },
         "appGatewayCertificateOption": {
-            "defaultValue": "haveCert",
+            "defaultValue": "generateCert",
             "type": "string",
             "metadata": {
                 "description": "Three scenarios we support for deploying app gateway"

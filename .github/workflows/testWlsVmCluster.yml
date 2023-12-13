@@ -502,15 +502,6 @@ jobs:
             --parameters @${{ env.offerPath }}/test/scripts/parameters-deploy-db.json \
             --template-file ${artifactName}/nestedtemplates/dbTemplate.json
 
-      - name: Generate Application Gateway Certificate
-        id: gen-certificate-agw
-        run: |
-          echo "Generate SSL Certificate for Application Gateway"
-          openssl genrsa -passout pass:${{ env.wlsPassword }} -out privkey.pem 3072
-          openssl req -x509 -new -key privkey.pem -out privkey.pub -subj "/C=US"
-          openssl pkcs12 -passout pass:${{ env.wlsPassword }} -export -in privkey.pub -inkey privkey.pem -out mycert.pfx
-          agwCertificateBase64String=$(base64 mycert.pfx -w 0)
-          echo "agwCertificateBase64String=${agwCertificateBase64String}" >> $GITHUB_ENV
       - name: Set up Application Gateway by Deploying Sub Template
         id: enable-application-gateway
         run: |
@@ -520,8 +511,6 @@ jobs:
             ${GITHUB_REPOSITORY} \
             ${{ env.testbranchName }} \
             ${{ env.adminVMName }} \
-            ${agwCertificateBase64String} \
-            ${{ env.wlsPassword }} \
             ${{ env.numberOfInstances }} \
             ${{ env.location }} \
             ${{ env.wlsPassword }} \
