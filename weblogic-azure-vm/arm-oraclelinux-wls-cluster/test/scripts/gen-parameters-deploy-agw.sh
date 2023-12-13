@@ -19,6 +19,12 @@ cat <<EOF > ${parametersPath}
         "adminVMName": {
             "value": "${adminVMName}"
         },
+        "appGatewaySSLCertificateData": {
+            "value": "GEN-UNIQUE"
+        },
+        "appGatewaySSLCertificatePassword": {
+            "value": "GEN-UNIQUE"
+        },
         "numberOfInstances": {
             "value": ${numberOfInstances}
         },
