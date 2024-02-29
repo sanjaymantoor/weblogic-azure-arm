@@ -21,6 +21,13 @@
             "version": "1.11.11",
             "downloadURL": "https://github.com/oracle/weblogic-image-tool/releases/download/release-1.11.11/imagetool.zip",
             "testedDate": "2023-05-16"
+        },
+        {
+            "key": "WME",
+            "description": "Oracle Weblogic Monitoring Exporter",
+            "version": "2.1.9",
+            "imageURL": "ghcr.io/oracle/weblogic-monitoring-exporter:2.1.9",
+            "testedDate": "2024-02-29"
         }
     ]
 }
