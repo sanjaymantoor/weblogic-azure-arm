@@ -146,7 +146,7 @@ function check_acr() {
       echo_stdout "Check if ACR ${ACR_NAME} is ready, attempt: ${attempt}."
       ready=true
 
-      local ret=$(az acr show --name ${ACR_NAME})
+      local ret=$(az acr show --name ${ACR_NAME} --resource-group ${ACR_RESOURCE_GROUP})
       if [ -z "${ret}" ]; then
           ready=false
       fi
@@ -192,6 +192,7 @@ function validate_ocr_image() {
   # if failure happens, the image should be unavailable
   local tmpImagePath="tmp$(date +%s):${wlsImageTag}"
   az acr import --name ${ACR_NAME} \
+    --resource-group ${ACR_RESOURCE_GROUP} \
     --source ${ocrImageFullPath} \
     -u ${ORACLE_ACCOUNT_NAME} \
     -p ${ORACLE_ACCOUNT_PASSWORD} \
