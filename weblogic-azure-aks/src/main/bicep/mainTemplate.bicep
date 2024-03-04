@@ -258,6 +258,7 @@ param useInternalLB bool = false
 param utcValue string = utcNow()
 @description('User provided ACR for base image')
 param userProvidedAcr string = 'null'
+param userProvidedAcrRgName string = 'null'
 @description('User provided base image path')
 param userProvidedImagePath string = 'null'
 @description('Use Oracle images or user provided patched images')
@@ -559,6 +560,7 @@ module wlsDomainDeployment 'modules/setupWebLogicCluster.bicep' = if (!enableCus
     aciRetentionInDays: aciRetentionInDays
     aciWorkspaceSku: aciWorkspaceSku
     acrName: preAzureResourceDeployment.outputs.acrName
+    acrResourceGroupName: preAzureResourceDeployment.outputs.acrResourceGroupName
     aksAgentPoolName: aksAgentPoolName
     aksAgentPoolNodeCount: aksAgentPoolNodeCount
     vmSize: vmSize
@@ -590,6 +592,7 @@ module wlsDomainDeployment 'modules/setupWebLogicCluster.bicep' = if (!enableCus
     t3ChannelClusterPort: t3ChannelClusterPort
     wdtRuntimePassword: wdtRuntimePassword
     userProvidedAcr: userProvidedAcr
+    userProvidedAcrRgName: userProvidedAcrRgName
     userProvidedImagePath: userProvidedImagePath
     useOracleImage: useOracleImage
     wlsClusterSize: wlsClusterSize
@@ -627,6 +630,7 @@ module wlsDomainWithCustomSSLDeployment 'modules/setupWebLogicCluster.bicep' = i
     aciRetentionInDays: aciRetentionInDays
     aciWorkspaceSku: aciWorkspaceSku
     acrName: preAzureResourceDeployment.outputs.acrName
+    acrResourceGroupName: preAzureResourceDeployment.outputs.acrResourceGroupName
     aksAgentPoolName: aksAgentPoolName
     aksAgentPoolNodeCount: aksAgentPoolNodeCount
     vmSize: vmSize
@@ -657,6 +661,7 @@ module wlsDomainWithCustomSSLDeployment 'modules/setupWebLogicCluster.bicep' = i
     t3ChannelAdminPort: t3ChannelAdminPort
     t3ChannelClusterPort: t3ChannelClusterPort
     userProvidedAcr: userProvidedAcr
+    userProvidedAcrRgName: userProvidedAcrRgName
     userProvidedImagePath: userProvidedImagePath
     useOracleImage: useOracleImage
     wdtRuntimePassword: wdtRuntimePassword

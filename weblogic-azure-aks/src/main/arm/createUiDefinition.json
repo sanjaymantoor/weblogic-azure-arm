@@ -2332,6 +2332,7 @@
             "useInternalLB": "[bool(steps('section_appGateway').lbSVCInfo.enableInternalLB)]",
             "useOracleImage": "[if(bool(steps('section_aks').aksAdvancedInfo.useAcrImage), false, true)]",
             "userProvidedAcr": "[last(split(steps('section_aks').aksAdvancedInfo.userProvidedAcrSelector.id, '/'))]",
+            "userProvidedAcrRgName": "[last(take(split(steps('section_aks').aksAdvancedInfo.userProvidedAcrSelector.id, '/'),5))]",
             "userProvidedImagePath": "[steps('section_aks').aksAdvancedInfo.userProvidedImagePath]",
             "validateApplications": true,
             "vnetForApplicationGateway": "[steps('section_appGateway').appgwIngress.vnetForApplicationGateway]",
