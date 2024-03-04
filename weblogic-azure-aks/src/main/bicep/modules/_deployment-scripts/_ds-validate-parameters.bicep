@@ -2,6 +2,7 @@
 // Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 
 param acrName string
+param acrResourceGroupName string
 param aksAgentPoolNodeCount int
 param aksAgentPoolVMSize string = ''
 param aksClusterRGName string
@@ -94,6 +95,10 @@ resource deploymentScript 'Microsoft.Resources/deploymentScripts@${azure.apiVers
       {
         name: 'ACR_NAME'
         value: acrName
+      }
+      {
+        name: 'ACR_RESOURCE_GROUP'
+        value: acrResourceGroupName
       }
       {
         name: 'ACR_NAME_FOR_USER_PROVIDED_IMAGE'

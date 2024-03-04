@@ -29,6 +29,7 @@ param aciRetentionInDays int = 120
 @description('Pricing tier: PerGB2018 or legacy tiers (Free, Standalone, PerNode, Standard or Premium) which are not available to all customers.')
 param aciWorkspaceSku string = 'pergb2018'
 param acrName string = 'acr-contoso'
+param acrResourceGroupName string = 'acr-contoso-rg'
 @maxLength(12)
 @minLength(1)
 @description('The name for this node pool. Node pool must contain only lowercase letters and numbers. For Linux node pools the name cannot be longer than 12 characters.')
@@ -384,6 +385,7 @@ module preAzureResourceDeployment './modules/_preDeployedAzureResources.bicep' =
   name: 'pre-azure-resources-deployment'
   params: {
     acrName: acrName
+    acrResourceGroupName: acrResourceGroupName
     createNewAcr: const_createNewAcr
     location: location
   }
@@ -393,6 +395,7 @@ module validateInputs 'modules/_deployment-scripts/_ds-validate-parameters.bicep
   name: 'validate-parameters-and-fail-fast'
   params: {
     acrName: preAzureResourceDeployment.outputs.acrName
+    acrResourceGroupName: preAzureResourceDeployment.outputs.acrResourceGroupName
     aksAgentPoolNodeCount: aksAgentPoolNodeCount
     aksAgentPoolVMSize: vmSize
     aksClusterRGName: aksClusterRGName
