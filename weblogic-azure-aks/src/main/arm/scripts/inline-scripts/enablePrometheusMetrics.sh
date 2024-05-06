@@ -200,6 +200,11 @@ function wait_for_keda_ready(){
         echo_stdout "Check if KEDA is ready, attempt: ${attempt}."
         ready=true
 
+        local podCount=$(kubectl get pods -n ${KEDA_NAMESPACE} -o json | jq -r '.items | length')
+        if [ $podCount -lt 3 ];then
+            continue;
+        fi
+
         local podnames=$(kubectl get pods -n ${KEDA_NAMESPACE} -o json | jq -r '.items[].metadata.name')
         for podname in ${podnames}
         do 
