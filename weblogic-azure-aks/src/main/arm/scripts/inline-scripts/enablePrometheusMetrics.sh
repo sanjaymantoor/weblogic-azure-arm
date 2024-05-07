@@ -380,8 +380,6 @@ EOF
 # Main script
 set -Eo pipefail
 
-exit 1
-
 install_kubectl
 
 install_helm
