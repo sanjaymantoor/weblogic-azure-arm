@@ -11,7 +11,6 @@ function connect_aks(){
 
 function enable_promethues_metrics(){
     # See https://learn.microsoft.com/en-us/azure/azure-monitor/containers/kubernetes-monitoring-enable?tabs=cli#enable-prometheus-and-grafana
-    az extension remove --name aks-preview
     az extension add --name k8s-extension
 
     ### Use existing Azure Monitor workspace
