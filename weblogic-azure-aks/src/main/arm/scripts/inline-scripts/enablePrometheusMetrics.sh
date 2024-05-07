@@ -22,6 +22,9 @@ function enable_promethues_metrics(){
 
     utility_validate_status "Enable Promethues Metrics."
 
+    az extension add --name aks-preview
+    az extension remove --name k8s-extension
+
     #Verify that the DaemonSet was deployed properly on the Linux node pools
     #https://learn.microsoft.com/en-us/azure/azure-monitor/containers/kubernetes-monitoring-enable?tabs=cli#managed-prometheus
     kubectl get ds ama-metrics-node --namespace=kube-system
@@ -229,15 +232,10 @@ function wait_for_keda_ready(){
 
 # https://learn.microsoft.com/en-us/azure/azure-monitor/containers/integrate-keda
 function enable_keda_addon() {
-    az extension remove --name k8s-extension
-    az extension add --name aks-preview
-
     local oidcEnabled=$(az aks show --resource-group $AKS_CLUSTER_RG_NAME --name $AKS_CLUSTER_NAME --query oidcIssuerProfile.enabled)
     local workloadIdentity=$(az aks show --resource-group $AKS_CLUSTER_RG_NAME --name $AKS_CLUSTER_NAME --query securityProfile.workloadIdentity)
 
     if [[ "${oidcEnabled,,}" == "false" || -z "${workloadIdentity}" ]]; then
-        # mitigate https://github.com/Azure/azure-cli/issues/28649
-        pip install --upgrade azure-core
         az aks update -g $AKS_CLUSTER_RG_NAME -n $AKS_CLUSTER_NAME --enable-workload-identity --enable-oidc-issuer
         utility_validate_status "Enable oidc and worload identity in AKS $AKS_CLUSTER_NAME."
     fi
