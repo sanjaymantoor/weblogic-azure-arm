@@ -10,6 +10,7 @@ function connect_aks(){
 }
 
 function enable_promethues_metrics(){
+    # See https://learn.microsoft.com/en-us/azure/azure-monitor/containers/kubernetes-monitoring-enable?tabs=cli#enable-prometheus-and-grafana
     az extension remove --name aks-preview
     az extension add --name k8s-extension
 
@@ -236,6 +237,8 @@ function enable_keda_addon() {
     local workloadIdentity=$(az aks show --resource-group $AKS_CLUSTER_RG_NAME --name $AKS_CLUSTER_NAME --query securityProfile.workloadIdentity)
 
     if [[ "${oidcEnabled,,}" == "false" || -z "${workloadIdentity}" ]]; then
+        # mitigate https://github.com/Azure/azure-cli/issues/28649
+        pip install --upgrade azure-core
         az aks update -g $AKS_CLUSTER_RG_NAME -n $AKS_CLUSTER_NAME --enable-workload-identity --enable-oidc-issuer
         utility_validate_status "Enable oidc and worload identity in AKS $AKS_CLUSTER_NAME."
     fi
@@ -271,11 +274,15 @@ EOF
 
     helm install keda kedacore/keda \
         --namespace ${KEDA_NAMESPACE} \
-        --set serviceAccount.create=false \
-        --set serviceAccount.name=${KEDA_SERVICE_ACCOUNT_NAME} \
+        --set serviceAccount.operator.create=false \
+        --set serviceAccount.operator.name=${KEDA_SERVICE_ACCOUNT_NAME} \
         --set podIdentity.azureWorkload.enabled=true \
         --set podIdentity.azureWorkload.clientId=$KEDA_UAMI_CLIENT_ID \
-        --set podIdentity.azureWorkload.tenantId=$tenantId
+        --set podIdentity.azureWorkload.tenantId=$tenantId \
+        --set app.kubernetes.io/managed-by=Helm \
+        --set meta.helm.sh/release-name=keda \
+        --set meta.helm.sh/release-namespace=${KEDA_NAMESPACE} \
+        --version 2.14.2
 
     #validate
     wait_for_keda_ready
