@@ -231,6 +231,44 @@ function wait_for_keda_ready(){
     echo "KEDA is running." 
 }
 
+function get_keda_latest_version() {
+    local kedaVersion
+    kedaVersion=$(helm search repo kedacore/keda --versions | awk '/^kedacore\/keda/ {print $2; exit}')
+    export KEDA_VERSION="${kedaVersion}"
+    echo "KEDA version: ${KEDA_VERSION}"
+}
+
+
+function get_keda_version() {
+    local versionJsonFileName="aks_tooling_well_tested_version.json"
+    local kedaWellTestedVersion
+
+    # Download the version JSON file
+    curl -L "${gitUrl4AksToolingWellTestedVersionJsonFile}" --retry "${retryMaxAttempt}" -o "${versionJsonFileName}"
+
+    # Check if download was successful
+    if [ $? -ne 0 ]; then
+        get_keda_latest_version
+        exit 0
+    fi
+
+    # Extract KEDA version from JSON
+    kedaWellTestedVersion=$(jq -r '.items[] | select(.key == "keda") | .version' "${versionJsonFileName}")
+
+    # Print KEDA well-tested version
+    echo "KEDA well-tested version: ${kedaWellTestedVersion}"
+
+    # Search for KEDA version in Helm repo
+    if ! helm search repo kedacore/keda --versions | grep -q "${kedaWellTestedVersion}"; then
+        get_keda_latest_version
+        exit 0
+    fi
+
+    # Export KEDA version
+    export KEDA_VERSION="${kedaWellTestedVersion}"
+    echo "KEDA version: ${KEDA_VERSION}"
+}
+
 # https://learn.microsoft.com/en-us/azure/azure-monitor/containers/integrate-keda
 function enable_keda_addon() {
     local oidcEnabled=$(az aks show --resource-group $AKS_CLUSTER_RG_NAME --name $AKS_CLUSTER_NAME --query oidcIssuerProfile.enabled)
@@ -272,6 +310,8 @@ EOF
     helm repo add kedacore https://kedacore.github.io/charts
     helm repo update
 
+    get_keda_version
+
     helm install keda kedacore/keda \
         --namespace ${KEDA_NAMESPACE} \
         --set serviceAccount.operator.create=false \
@@ -282,7 +322,7 @@ EOF
         --set app.kubernetes.io/managed-by=Helm \
         --set meta.helm.sh/release-name=keda \
         --set meta.helm.sh/release-namespace=${KEDA_NAMESPACE} \
-        --version 2.14.2
+        --version ${KEDA_VERSION}
 
     #validate
     wait_for_keda_ready
