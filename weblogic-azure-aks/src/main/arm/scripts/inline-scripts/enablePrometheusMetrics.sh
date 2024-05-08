@@ -79,7 +79,7 @@ function get_wls_monitoring_exporter_image_url() {
     curl -m ${curlMaxTime} --retry ${retryMaxAttempt} -fsL "${gitUrl4WLSToolingFamilyJsonFile}" -o ${wlsToolingFamilyJsonFile}
     if [ $? -eq 0 ]; then
         imageURL=$(cat ${wlsToolingFamilyJsonFile} | jq  ".items[] | select(.key==\"WME\") | .imageURL" | tr -d "\"")
-        echo "well tested monitoring exporter image url: ${imageURL}"
+        echo_stdout "well tested monitoring exporter image url: ${imageURL}"
     fi
 
     echo_stdout "Use monitoring exporter image: ${imageURL} "
@@ -205,7 +205,7 @@ function wait_for_keda_ready(){
 
         local podCount=$(kubectl get pods -n ${KEDA_NAMESPACE} -o json | jq -r '.items | length')
         if [ $podCount -lt 3 ];then
-            continue;
+            ready=false
         fi
 
         local podnames=$(kubectl get pods -n ${KEDA_NAMESPACE} -o json | jq -r '.items[].metadata.name')
@@ -227,14 +227,14 @@ function wait_for_keda_ready(){
         exit 1
     fi
 
-    echo "KEDA is running." 
+    echo_stderr "KEDA is running." 
 }
 
 function get_keda_latest_version() {
     local kedaVersion
     kedaVersion=$(helm search repo kedacore/keda --versions | awk '/^kedacore\/keda/ {print $2; exit}')
     export KEDA_VERSION="${kedaVersion}"
-    echo "Use latest KEDA. KEDA version: ${KEDA_VERSION}"
+    echo_stderr "Use latest KEDA. KEDA version: ${KEDA_VERSION}"
 }
 
 
@@ -255,7 +255,7 @@ function get_keda_version() {
     fi
 
     # Print KEDA well-tested version
-    echo "KEDA well-tested version: ${kedaWellTestedVersion}"
+    echo_stderr "KEDA well-tested version: ${kedaWellTestedVersion}"
 
     # Search for KEDA version in Helm repo
     if ! helm search repo kedacore/keda --versions | grep -q "${kedaWellTestedVersion}"; then
@@ -265,7 +265,7 @@ function get_keda_version() {
 
     # Export KEDA version
     export KEDA_VERSION="${kedaWellTestedVersion}"
-    echo "KEDA version: ${KEDA_VERSION}"
+    echo_stderr "KEDA version: ${KEDA_VERSION}"
 }
 
 # https://learn.microsoft.com/en-us/azure/azure-monitor/containers/integrate-keda
