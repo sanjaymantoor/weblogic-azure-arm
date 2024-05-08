@@ -34,6 +34,19 @@ function enable_promethues_metrics(){
 
 # https://learn.microsoft.com/en-us/azure/azure-monitor/containers/prometheus-metrics-scrape-configuration
 function deploy_customize_scraping(){
+    # https://learn.microsoft.com/en-us/azure/azure-monitor/containers/prometheus-metrics-scrape-configuration?tabs=CRDConfig%2CCRDScrapeConfig#basic-authentication
+    local wlsPswBase64=$(echo -n "${WLS_ADMIN_PASSWORD}" | base64)
+    cat <<EOF apply -f
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ama-metrics-mtls-secret
+  namespace: kube-system
+type: Opaque
+data:
+  password1: ${wlsPswBase64}
+EOF
+
     #create scrape config file
     cat <<EOF >prometheus-config
 global:
@@ -46,7 +59,7 @@ scrape_configs:
       names: [${WLS_NAMESPACE}]
   basic_auth:
     username: ${WLS_ADMIN_USERNAME}
-    password: ${WLS_ADMIN_PASSWORD}
+    password_file: /etc/prometheus/certs/password1
 EOF
 
     #validate the scrape config file
