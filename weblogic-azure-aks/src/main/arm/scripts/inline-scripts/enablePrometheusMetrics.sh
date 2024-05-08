@@ -234,7 +234,7 @@ function get_keda_latest_version() {
     local kedaVersion
     kedaVersion=$(helm search repo kedacore/keda --versions | awk '/^kedacore\/keda/ {print $2; exit}')
     export KEDA_VERSION="${kedaVersion}"
-    echo "KEDA version: ${KEDA_VERSION}"
+    echo "Use latest KEDA. KEDA version: ${KEDA_VERSION}"
 }
 
 
@@ -243,16 +243,16 @@ function get_keda_version() {
     local kedaWellTestedVersion
 
     # Download the version JSON file
-    curl -L "${gitUrl4AksToolingWellTestedVersionJsonFile}" --retry "${retryMaxAttempt}" -o "${versionJsonFileName}"
-
-    # Check if download was successful
-    if [ $? -ne 0 ]; then
-        get_keda_latest_version
-        exit 0
-    fi
+    curl -L "${gitUrl4AksToolingWellTestedVersionJsonFile}" --retry "${retryMaxAttempt}" -o "${versionJsonFileName}"   
 
     # Extract KEDA version from JSON
     kedaWellTestedVersion=$(jq -r '.items[] | select(.key == "keda") | .version' "${versionJsonFileName}")
+
+    # Check if version is available
+    if [ $? -ne 0 ]; then
+        get_keda_latest_version
+        return 0
+    fi
 
     # Print KEDA well-tested version
     echo "KEDA well-tested version: ${kedaWellTestedVersion}"
@@ -260,7 +260,7 @@ function get_keda_version() {
     # Search for KEDA version in Helm repo
     if ! helm search repo kedacore/keda --versions | grep -q "${kedaWellTestedVersion}"; then
         get_keda_latest_version
-        exit 0
+        return 0
     fi
 
     # Export KEDA version
