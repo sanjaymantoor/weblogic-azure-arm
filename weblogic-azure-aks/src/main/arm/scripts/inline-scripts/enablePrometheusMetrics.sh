@@ -36,7 +36,7 @@ function enable_promethues_metrics(){
 function deploy_customize_scraping(){
     # https://learn.microsoft.com/en-us/azure/azure-monitor/containers/prometheus-metrics-scrape-configuration?tabs=CRDConfig%2CCRDScrapeConfig#basic-authentication
     local wlsPswBase64=$(echo -n "${WLS_ADMIN_PASSWORD}" | base64)
-    cat <<EOF apply -f
+    cat <<EOF | kubectl apply -f -
 apiVersion: v1
 kind: Secret
 metadata:
