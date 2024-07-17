@@ -17,11 +17,16 @@ jobs:
     if: github.event_name == 'workflow_dispatch' || (github.event_name == 'schedule' && github.repository_owner == 'azure-javaee')
     runs-on: ubuntu-latest
     steps:
+    # - name: Checkout oracle/weblogic-azure:main
+    #   uses: actions/checkout@v2
+    #   with:
+    #     repository: oracle/${{ env.repoName }}
+    #     ref: main
+    #     path: ${{ env.repoName }}
+
     - name: Checkout oracle/weblogic-azure:main
       uses: actions/checkout@v2
       with:
-        repository: oracle/${{ env.repoName }}
-        ref: main
         path: ${{ env.repoName }}
 
     - uses: azure/login@v1
