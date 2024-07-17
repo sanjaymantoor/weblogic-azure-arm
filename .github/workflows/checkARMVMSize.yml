@@ -107,6 +107,6 @@ jobs:
         # Create a pull request
         gh pr create --title "Update ARM VM sizes" \
             --body "Automatic update of ARM VM sizes based on latest changes" \
-            --reviewer edburns,galiacheng
+            --reviewer edburns,galiacheng \
             --base main \
             --head ${branchName}
