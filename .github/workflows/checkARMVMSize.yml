@@ -103,7 +103,7 @@ jobs:
         property_file="resources/azure-common.properties"
         sed -i '/^azure\.armBased\.vmSize\.list=/d' "$property_file"
         latest_sizes=${{ steps.check_vm_sizes.outputs.latest_sizes }}
-        echo "azure.armBased.vmSize.list=$latest_sizes" >> "$property_file"
+        echo "azure.armBased.vmSize.list=\"$latest_sizes\"" >> "$property_file"
 
         git add $property_file
         git commit -m "Update ARM VM sizes"
@@ -112,6 +112,6 @@ jobs:
         # Create a pull request
         gh pr create --title "Update ARM VM sizes" \
             --body "Automatic update of ARM VM sizes based on latest changes" \
-            --repo oracle/weblogic-azure \
-            --base main \
+            --reviewer edburns,galiacheng
+            --base wls-vm-exclude-cpu-arch \
             --head ${branchName}
